@@ -1,0 +1,2 @@
+[functions.send-email-story]
+verify_jwt = false

@@ -1,0 +1,2 @@
+[deploy]
+allowed_http_methods = ["GET", "OPTIONS"]

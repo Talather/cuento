@@ -1,0 +1,41 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment and secrets
+.env
+.env.*
+
+# Database dumps and import artifacts
+public/old-db/
+old-db/
+*.sql.gz
+cuentito_dump*
+
+# Temp import/migration scripts
+import-old-db.mjs
+run-import.mjs
+split-and-import.mjs
+extract-images.mjs
+test-edge-functions.mjs
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

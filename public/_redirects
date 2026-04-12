@@ -1,0 +1,15 @@
+/robots.txt /robots.txt 200
+/sitemap.xml /sitemap_index.xml 301
+/login /index.html 200
+/dashboard /index.html 200
+/profile /index.html 200
+/auth/callback /index.html 200
+/library /index.html 200
+/liked /index.html 200
+/search /index.html 200
+/contact /index.html 200
+/terms-of-service /index.html 200
+/privacy-policy /index.html 200
+/story/* /index.html 200
+/payment/* /index.html 200
+/* /index.html 200

@@ -1,0 +1,17 @@
+@media print {
+  /* Hide navigation, sidebar, feedback form, and related stories */
+  nav,
+  .fixed,
+  .StoryFeedbackSection,
+  .StoryActions,
+  .space-y-4 {
+    display: none !important;
+  }
+
+  /* Ensure story content takes full width */
+  .container {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://cuenti.to/sitemap_index.xml
