@@ -54,27 +54,25 @@ export function validateTimestamp(timestamp: unknown): number {
 
 export const validateRequest = async (supabaseClient: any, userId: string | null, requestId: string, timestamp: number) => {
   try {
-    // Check if this request has already been processed
-    const { data: existingRequest } = await supabaseClient
+    const { data: existingRequest, error } = await supabaseClient
       .from('image_generation_logs')
       .select('id')
       .eq('id', requestId)
       .single();
 
-    if (existingRequest) {
-      throw new Error('DUPLICATE_REQUEST');
+    if (error) {
+      console.warn('Validation query failed (non-blocking):', error.message);
+      return;
     }
 
-    // TEMPORARILY DISABLED: No rate limiting for now
-    // This will allow unlimited requests for testing purposes
-  } catch (error: any) {
-    // Sanitize error messages
-    if (error.message === 'DUPLICATE_REQUEST') {
+    if (existingRequest) {
       throw new Error('This request has already been processed');
     }
-    
-    // Generic error for any other cases
-    throw new Error('Failed to validate request');
+  } catch (error: any) {
+    if (error.message === 'This request has already been processed') {
+      throw error;
+    }
+    console.warn('Validation check failed (non-blocking):', error.message);
   }
 };
 

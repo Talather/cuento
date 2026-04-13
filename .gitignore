@@ -28,6 +28,11 @@ run-import.mjs
 split-and-import.mjs
 extract-images.mjs
 test-edge-functions.mjs
+deploy-server.mjs
+deploy-dist.mjs
+fix-server.mjs
+fix-images.mjs
+purge-cache.mjs
 
 # Editor directories and files
 .vscode/*

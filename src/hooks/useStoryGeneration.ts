@@ -72,25 +72,19 @@ export const useStoryGeneration = (
         }
       }
 
-      // Generate images using the appropriate service based on subscription status
       const generatedImages = await Promise.all(
         imagePrompts.map(prompt => 
            imageService.generateImage(prompt)
         )
       );
 
-      // Extract all image URLs and ensure they're valid
       const featuredImage = generatedImages[0];
       const middleImages = generatedImages.slice(1).filter(Boolean);
-      
-      // Join middle images with comma, but only include valid URLs
       const combinedMiddleImages = middleImages.length > 0 ? middleImages.join(',') : null;
 
-      // console.log('Generated images:', {
-      //  featuredImage,
-      //  middleImages,
-      //  combinedMiddleImages
-      // });
+      if (!featuredImage) {
+        console.warn('Featured image generation failed — story will be saved without it');
+      }
 
       const { data: story, error: saveError } = await supabase
         .from('stories')
