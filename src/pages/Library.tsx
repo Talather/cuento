@@ -10,10 +10,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { useUserCredits } from "@/hooks/useUserCredits";
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 18;
 
 interface LibraryResponse {
   stories: Story[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
 }
 
 export default function Library() {
@@ -25,16 +28,19 @@ export default function Library() {
   const showUserStories = searchParams.get("filter") === "my-stories";
 
   const { data: storiesData, isLoading } = useQuery({
-    queryKey: ['library-stories', showUserStories, session?.user?.id],
+    queryKey: ['library-stories', showUserStories, session?.user?.id, currentPage, currentSort],
     queryFn: async () => {
       if (showUserStories && !session?.user?.id) {
-        throw new Error("User must be authenticated to view their stories");
+        return { stories: [], totalCount: 0, page: 1, pageSize: ITEMS_PER_PAGE };
       }
 
       const { data, error } = await supabase.functions.invoke<LibraryResponse>('get-user-stories', {
         body: { 
           userId: showUserStories ? session?.user?.id : null,
-          showTopRated: !showUserStories
+          showTopRated: !showUserStories,
+          page: currentPage,
+          pageSize: ITEMS_PER_PAGE,
+          sort: currentSort,
         }
       });
 
@@ -45,24 +51,11 @@ export default function Library() {
 
       return data;
     },
+    keepPreviousData: true,
   });
 
-  const stories = storiesData?.stories || [];
-  
-  const sortedStories = [...stories].sort((a, b) => {
-    const [field, order] = currentSort.split('-');
-    if (field === 'likes') {
-      return order === 'asc' ? (a.likes - b.likes) : (b.likes - a.likes);
-    } else {
-      const dateA = new Date(a.created_at || '').getTime();
-      const dateB = new Date(b.created_at || '').getTime();
-      return order === 'asc' ? (dateA - dateB) : (dateB - dateA);
-    }
-  });
-
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedStories = sortedStories.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  const totalPages = Math.ceil(stories.length / ITEMS_PER_PAGE);
+  const paginatedStories = storiesData?.stories || [];
+  const totalPages = Math.ceil((storiesData?.totalCount || 0) / ITEMS_PER_PAGE);
 
   const handleSortChange = (value: string) => {
     setSearchParams((params) => {

@@ -4,6 +4,9 @@ import { corsHeaders } from '../_shared/cors.ts'
 interface RequestBody {
   userId: string | null;
   showTopRated: boolean;
+  page?: number;
+  pageSize?: number;
+  sort?: string;
 }
 
 Deno.serve(async (req) => {
@@ -23,8 +26,24 @@ Deno.serve(async (req) => {
       }
     )
 
-    const { userId, showTopRated } = (await req.json()) as RequestBody;
+    const { userId, showTopRated, page = 1, pageSize = 18, sort = 'likes-desc' } = (await req.json()) as RequestBody;
 
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    // Get total count
+    let countQuery = supabaseClient
+      .from('stories')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'published');
+
+    if (userId) {
+      countQuery = countQuery.eq('user_id', userId);
+    }
+
+    const { count: totalCount } = await countQuery;
+
+    // Get paginated data
     let query = supabaseClient
       .from('stories')
       .select('id, title, synopsis, likes, image_url, created_at, cuentito_uid')
@@ -32,11 +51,16 @@ Deno.serve(async (req) => {
 
     if (userId) {
       query = query.eq('user_id', userId);
-    } else if (showTopRated) {
-      query = query.order('likes', { ascending: false });
     }
 
-    const { data: stories, error } = await query.limit(100);
+    const [sortField, sortOrder] = sort.split('-');
+    if (sortField === 'likes') {
+      query = query.order('likes', { ascending: sortOrder === 'asc' });
+    } else {
+      query = query.order('created_at', { ascending: sortOrder === 'asc' });
+    }
+
+    const { data: stories, error } = await query.range(from, to);
 
     if (error) {
       console.error('Database query error:', error);
@@ -44,7 +68,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ stories: stories || [] }),
+      JSON.stringify({ stories: stories || [], totalCount: totalCount ?? 0, page, pageSize }),
       { 
         headers: { 
           ...corsHeaders,

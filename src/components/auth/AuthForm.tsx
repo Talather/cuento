@@ -63,7 +63,7 @@ export const AuthForm = ({ storyId }: AuthFormProps) => {
           },
         }}
         theme="light"
-        providers={["google", "facebook"]}
+        providers={["google"]}
         redirectTo={window.location.origin + "/auth/callback"}
         onlyThirdPartyProviders={true}
         view="sign_in"

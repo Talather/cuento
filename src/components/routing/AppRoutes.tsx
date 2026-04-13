@@ -67,14 +67,7 @@ export const AppRoutes = () => (
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/library"
-          element={
-            <ProtectedRoute>
-              <Library />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/library" element={<Library />} />
         <Route
           path="/liked"
           element={
