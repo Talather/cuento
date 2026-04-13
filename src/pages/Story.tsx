@@ -14,7 +14,7 @@ import { useSessionData } from "@/hooks/useSessionData";
 import { StoryLikeHandler } from "@/components/StoryLikeHandler";
 import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet";
-import { getStoryFeaturedImage, DEFAULT_OG_IMAGE } from "@/utils/config";
+import { getStoryFeaturedImage, DEFAULT_OG_IMAGE, PLACEHOLDER_IMAGE } from "@/utils/config";
 
 export default function Story() {
   const { title, id } = useParams<{ title: string; id?: string }>();
@@ -74,7 +74,7 @@ export default function Story() {
 
   const publishDate = format(new Date(story.created_at), 'MM/dd/yyyy');
   const canonicalUrl = `https://cuenti.to/story/${createSlug(story.title)}/${story.id}`;
-  const featuredImageUrl = getStoryFeaturedImage(story);
+  const featuredImageUrl = getStoryFeaturedImage(story) || DEFAULT_OG_IMAGE;
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { createSlug } from "@/utils/slugUtils";
-import { getStoryFeaturedImage, DEFAULT_OG_IMAGE } from "@/utils/config";
+import { getStoryFeaturedImage, PLACEHOLDER_IMAGE } from "@/utils/config";
 
 interface Story {
   id: string;
@@ -22,7 +22,7 @@ export function RelatedStories({ stories, isLoading }: RelatedStoriesProps) {
   const { t } = useTranslation();
 
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.src = DEFAULT_OG_IMAGE;
+    event.currentTarget.src = PLACEHOLDER_IMAGE;
   };
 
   const handleStoryClick = (storyTitle: string, storyId: string) => {
@@ -60,12 +60,18 @@ export function RelatedStories({ stories, isLoading }: RelatedStoriesProps) {
               className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => handleStoryClick(story.title, story.id)}
             >
-              <img
-                src={featuredImageUrl}
-                alt={story.title}
-                className="w-full h-48 object-cover mb-4 rounded"
-                onError={handleImageError}
-              />
+              {featuredImageUrl ? (
+                <img
+                  src={featuredImageUrl}
+                  alt={story.title}
+                  className="w-full h-48 object-cover mb-4 rounded"
+                  onError={handleImageError}
+                />
+              ) : (
+                <div className="w-full h-48 rounded mb-4 bg-gradient-to-br from-violet-600 to-purple-400 flex items-center justify-center">
+                  <span className="text-5xl">📖</span>
+                </div>
+              )}
               <h3 className="font-semibold line-clamp-2">{story.title}</h3>
             </Card>
           );
