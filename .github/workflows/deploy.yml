@@ -1,0 +1,59 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'old-db/**'
+      - '*.md'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Hetzner VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 5.78.178.87
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          script_stop: true
+          command_timeout: 10m
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            
+            PROJECT_DIR=""
+            for dir in /home/deploy/cuentitov2 /home/deploy/cuento /root/cuentitov2 /root/cuento /var/www/cuentito-src; do
+              if [ -f "$dir/package.json" ]; then
+                PROJECT_DIR="$dir"
+                break
+              fi
+            done
+            
+            if [ -z "$PROJECT_DIR" ]; then
+              echo "ERROR: Could not find project directory"
+              exit 1
+            fi
+            
+            echo "Found project at: $PROJECT_DIR"
+            cd "$PROJECT_DIR"
+            
+            git pull origin main
+            
+            npm install --production=false
+            npm run build
+            
+            # If using pm2 (vite preview)
+            if command -v pm2 &> /dev/null && pm2 list | grep -q "cuentito"; then
+              pm2 restart cuentito
+              echo "Restarted pm2 process"
+            fi
+            
+            # If serving static files via Nginx
+            if [ -d /var/www/cuentito ]; then
+              cp -r dist/* /var/www/cuentito/
+              echo "Copied dist to /var/www/cuentito"
+            fi
+            
+            echo "Deploy complete!"
