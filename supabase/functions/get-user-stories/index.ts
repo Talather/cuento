@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     // Get paginated data
     let query = supabaseClient
       .from('stories')
-      .select('id, title, synopsis, likes, image_url, created_at, cuentito_uid')
+      .select('id, title, synopsis, likes, image_url, middle_images, created_at, cuentito_uid')
       .eq('status', 'published');
 
     if (userId) {
